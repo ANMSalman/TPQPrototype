@@ -3,7 +3,7 @@ using TPQPrototype.Shared.Models.Visa;
 
 namespace TPQPrototype.Shared.Serializers.Visa
 {
-    public interface IVisaXmlContentSerializer
+    public interface IVisaXmlContentSerializer : IContentSerializer
     {
         Task<VisaXmlContentModel> Deserialize(string content);
         Task<string> Serialize(VisaXmlContentModel model);

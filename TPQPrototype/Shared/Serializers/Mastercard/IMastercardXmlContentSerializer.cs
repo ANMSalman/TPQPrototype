@@ -3,7 +3,7 @@ using TPQPrototype.Shared.Models.Mastercard;
 
 namespace TPQPrototype.Shared.Serializers.Mastercard
 {
-    public interface IMastercardXmlContentSerializer
+    public interface IMastercardXmlContentSerializer : IContentSerializer
     {
         Task<MastercardXmlContentModel> Deserialize(string content);
         Task<string> Serialize(MastercardXmlContentModel model);

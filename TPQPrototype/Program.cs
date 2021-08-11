@@ -2,23 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TPQPrototype.Enums;
 using TPQPrototype.SearchEngine;
 using TPQPrototype.SearchEngine.Aggregates;
 using TPQPrototype.SearchEngine.Engines;
-using TPQPrototype.SearchEngine.Engines.Mastercard;
-using TPQPrototype.SearchEngine.Engines.Mastercard.ContentSource;
-using TPQPrototype.SearchEngine.Engines.Mastercard.ContentSource.Batch;
-using TPQPrototype.SearchEngine.Engines.Mastercard.ContentSource.Xml;
-using TPQPrototype.SearchEngine.Engines.Visa;
-using TPQPrototype.SearchEngine.Engines.Visa.ContentSource;
-using TPQPrototype.SearchEngine.Engines.Visa.ContentSource.Json;
-using TPQPrototype.SearchEngine.Engines.Visa.ContentSource.Xml;
+using TPQPrototype.Shared;
 using TPQPrototype.Shared.Request;
-using TPQPrototype.Shared.Serializers.Mastercard;
-using TPQPrototype.Shared.Serializers.Visa;
 
 namespace TPQPrototype
 {
@@ -28,13 +20,16 @@ namespace TPQPrototype
         {
             var collection = new ServiceCollection();
 
-            AddSerializers(collection);
-            AddFactories(collection);
-            AddEngines(collection);
+            AddServices<IContentSerializer>(collection);
+            AddServices<IFactory>(collection);
+            AddServices<IEngine>(collection);
 
             collection.AddScoped<ISearchEngine, SearchEngine.Engines.SearchEngine>();
             collection.Decorate<ISearchEngine, LoyaltyAggregator>();
             collection.Decorate<ISearchEngine, AdminAggregator>();
+
+            Console.WriteLine("\nServices Registered");
+
 
             var services = collection.BuildServiceProvider();
 
@@ -56,6 +51,9 @@ namespace TPQPrototype
 
             var engine = services.GetRequiredService<ISearchEngine>();
 
+
+            Console.WriteLine("\nSearching...\n");
+
             var watch = new Stopwatch();
             watch.Start();
 
@@ -65,40 +63,60 @@ namespace TPQPrototype
 
             Console.WriteLine(JsonSerializer.Serialize(result));
             Console.WriteLine();
-            Console.WriteLine($"Elapsed: {watch.ElapsedMilliseconds}");
+            Console.WriteLine($"Search Complete. Elapsed Time(milliseconds): {watch.ElapsedMilliseconds}");
 
         }
-        private static void AddSerializers(IServiceCollection services)
+        private static void AddServices<T>(IServiceCollection collection)
         {
-            //TODO: need to find a way to register dynamically. May be using Scrutor
+            var type = typeof(T);
 
-            services.AddScoped<IMastercardXmlContentSerializer, MastercardXmlContentSerializer>();
-            services.AddScoped<IMastercardBatchContentSerializer, MastercardBatchContentSerializer>();
+            var services = type.Assembly.GetExportedTypes()
+                .Where(x => x.GetInterfaces().Contains(type) && !x.IsAbstract && x.IsClass)
+                .Select(x => new
+                {
+                    Interface = x.GetInterfaces().FirstOrDefault(),
+                    Implementation = x
+                })
+                .ToList();
 
-            services.AddScoped<IVisaJsonContentSerializer, VisaJsonContentSerializer>();
-            services.AddScoped<IVisaXmlContentSerializer, VisaXmlContentSerializer>();
+            foreach (var service in services)
+            {
+                Console.WriteLine($"Registering : {service.Interface.Name} : {service.Implementation.Name}");
+                collection.AddScoped(service.Interface, service.Implementation);
+            }
         }
-        private static void AddFactories(IServiceCollection services)
-        {
-            //TODO: need to find a way to register dynamically. May be using Scrutor
 
-            services.AddScoped<IOperatorSearchEngineFactory, OperatorSearchEngineFactory>();
-            services.AddScoped<IMastercardContentSourceSearchEngineFactory, MastercardContentSourceSearchEngineFactory>();
-            services.AddScoped<IVisaContentSourceSearchEngineFactory, VisaContentSourceSearchEngineFactory>();
-        }
-        private static void AddEngines(IServiceCollection services)
-        {
-            //TODO: need to find a way to register dynamically. May be using Scrutor
+        //private static void AddSerializers(IServiceCollection services)
+        //{
+        //    //TODO: need to find a way to register dynamically. May be using Scrutor
 
-            services.AddScoped<IOperatorSearchEngine, MastercardSearchEngine>();
-            services.AddScoped<IMastercardContentSourceSearchEngine, MastercardXmlSearchEngine>();
-            services.AddScoped<IMastercardContentSourceSearchEngine, MastercardBatchSearchEngine>();
+        //    services.AddScoped<IMastercardXmlContentSerializer, MastercardXmlContentSerializer>();
+        //    services.AddScoped<IMastercardBatchContentSerializer, MastercardBatchContentSerializer>();
+
+        //    services.AddScoped<IVisaJsonContentSerializer, VisaJsonContentSerializer>();
+        //    services.AddScoped<IVisaXmlContentSerializer, VisaXmlContentSerializer>();
+        //}
+        //private static void AddFactories(IServiceCollection services)
+        //{
+        //    //TODO: need to find a way to register dynamically. May be using Scrutor
+
+        //    services.AddScoped<IOperatorSearchEngineFactory, OperatorSearchEngineFactory>();
+        //    services.AddScoped<IMastercardContentSourceSearchEngineFactory, MastercardContentSourceSearchEngineFactory>();
+        //    services.AddScoped<IVisaContentSourceSearchEngineFactory, VisaContentSourceSearchEngineFactory>();
+        //}
+        //private static void AddEngines(IServiceCollection services)
+        //{
+        //    //TODO: need to find a way to register dynamically. May be using Scrutor
+
+        //    services.AddScoped<IOperatorSearchEngine, MastercardSearchEngine>();
+        //    services.AddScoped<IMastercardContentSourceSearchEngine, MastercardXmlSearchEngine>();
+        //    services.AddScoped<IMastercardContentSourceSearchEngine, MastercardBatchSearchEngine>();
 
 
-            services.AddScoped<IOperatorSearchEngine, VisaSearchEngine>();
-            services.AddScoped<IVisaContentSourceSearchEngine, VisaXmlSearchEngine>();
-            services.AddScoped<IVisaContentSourceSearchEngine, VisaJsonSearchEngine>();
-        }
+        //    services.AddScoped<IOperatorSearchEngine, VisaSearchEngine>();
+        //    services.AddScoped<IVisaContentSourceSearchEngine, VisaXmlSearchEngine>();
+        //    services.AddScoped<IVisaContentSourceSearchEngine, VisaJsonSearchEngine>();
+        //}
     }
 
 }
