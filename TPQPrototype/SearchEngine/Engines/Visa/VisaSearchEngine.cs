@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TPQPrototype.Enums;
 using TPQPrototype.Shared.Request;
@@ -8,7 +9,7 @@ namespace TPQPrototype.SearchEngine.Engines.Visa
 {
     public class VisaSearchEngine : IOperatorSearchEngine
     {
-        public OperatorType OperatorType => OperatorType.Mastercard;
+        public OperatorType OperatorType => OperatorType.Visa;
 
 
         private readonly IVisaContentSourceSearchEngineFactory _contentSearchEngineFactory;
@@ -24,12 +25,11 @@ namespace TPQPrototype.SearchEngine.Engines.Visa
 
             var engines = _contentSearchEngineFactory.GetEngines(parameters.ContentTypes);
 
-            foreach (var searchEngine in engines)
-            {
-                var result = await searchEngine.Search(parameters.ContentSearchParameters);
+            var tasks = engines.Select(x => x.Search(parameters.ContentSearchParameters)).ToList();
 
-                response.AddRange(result);
-            }
+            await Task.WhenAll(tasks);
+
+            response.AddRange(tasks.SelectMany(x => x.Result));
 
             return response;
         }

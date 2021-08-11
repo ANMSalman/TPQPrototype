@@ -3,7 +3,7 @@ using TPQPrototype.Enums;
 
 namespace TPQPrototype.SearchEngine.Engines
 {
-    public interface IOperatorSearchEngineFactory
+    public interface IOperatorSearchEngineFactory : IFactory
     {
         List<IOperatorSearchEngine> GetEngines(List<OperatorType> operators);
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TPQPrototype.Shared.Request;
 using TPQPrototype.Shared.Response;
@@ -20,12 +21,11 @@ namespace TPQPrototype.SearchEngine.Engines
 
             var engines = _operatorSearchEngineFactory.GetEngines(request.Operators);
 
-            foreach (var searchEngine in engines)
-            {
-                var result = await searchEngine.Search(request.OperatorSearchParameters);
+            var tasks = engines.Select(x => x.Search(request.OperatorSearchParameters)).ToList();
 
-                response.AddRange(result);
-            }
+            await Task.WhenAll(tasks);
+
+            response.AddRange(tasks.SelectMany(x => x.Result));
 
             return response;
         }

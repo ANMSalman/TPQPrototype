@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TPQPrototype.Enums;
 using TPQPrototype.Shared.Request;
@@ -19,15 +20,24 @@ namespace TPQPrototype.SearchEngine.Engines.Mastercard.ContentSource.Batch
         public ContentType ContentType => ContentType.Batch;
         public async Task<List<SearchResponseModel>> Search(ContentSearchParameters parameters)
         {
+            var list = new List<SearchResponseModel>();
             // run your query here
 
-            var content = _serializer.Deserialize("");
+            var content = await _serializer.Deserialize("");
 
             // perform your filtering
+            list.Add(new SearchResponseModel()
+            {
+                Id = Guid.NewGuid(),
+                OperatorType = OperatorType.Mastercard,
+                ContentType = ContentType,
+                Content = ""
+            });
 
-            await Task.CompletedTask;
+            //Fake IO simulation
+            await Task.Delay(2000);
 
-            return new List<SearchResponseModel>();
+            return list;
         }
     }
 }

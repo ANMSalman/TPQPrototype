@@ -4,7 +4,7 @@ using TPQPrototype.SearchEngine.Engines.Mastercard.ContentSource;
 
 namespace TPQPrototype.SearchEngine.Engines.Mastercard
 {
-    public interface IMastercardContentSourceSearchEngineFactory
+    public interface IMastercardContentSourceSearchEngineFactory : IFactory
     {
         List<IMastercardContentSourceSearchEngine> GetEngines(List<ContentType> contentTypes);
     }

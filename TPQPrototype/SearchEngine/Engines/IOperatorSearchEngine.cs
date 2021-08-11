@@ -6,7 +6,7 @@ using TPQPrototype.Shared.Response;
 
 namespace TPQPrototype.SearchEngine.Engines
 {
-    public interface IOperatorSearchEngine
+    public interface IOperatorSearchEngine : IEngine
     {
         public OperatorType OperatorType { get; }
         Task<List<SearchResponseModel>> Search(OperatorSearchParameters parameters);

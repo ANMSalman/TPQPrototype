@@ -6,7 +6,7 @@ using TPQPrototype.Shared.Response;
 
 namespace TPQPrototype.SearchEngine.Engines.Mastercard.ContentSource
 {
-    public interface IMastercardContentSourceSearchEngine
+    public interface IMastercardContentSourceSearchEngine : IEngine
     {
         public ContentType ContentType { get; }
         Task<List<SearchResponseModel>> Search(ContentSearchParameters parameters);

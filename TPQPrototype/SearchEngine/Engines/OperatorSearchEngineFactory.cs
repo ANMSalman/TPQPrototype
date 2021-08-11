@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -10,14 +11,17 @@ namespace TPQPrototype.SearchEngine.Engines
     {
         private readonly IReadOnlyDictionary<OperatorType, IOperatorSearchEngine> _searchEngines;
 
-        public OperatorSearchEngineFactory()
+        public OperatorSearchEngineFactory(IServiceProvider serviceProvider)
         {
-            var searchEngineType = typeof(IOperatorSearchEngine);
+            //var searchEngineType = typeof(IOperatorSearchEngine);
 
-            _searchEngines = searchEngineType.Assembly.GetExportedTypes()
-                .Where(x => searchEngineType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(Activator.CreateInstance)
-                .Cast<IOperatorSearchEngine>()
+            //_searchEngines = searchEngineType.Assembly.GetExportedTypes()
+            //    .Where(x => searchEngineType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+            //    .Select(Activator.CreateInstance)
+            //    .Cast<IOperatorSearchEngine>()
+            //    .ToImmutableDictionary(x => x.OperatorType, x => x);
+
+            _searchEngines = serviceProvider.GetServices<IOperatorSearchEngine>()
                 .ToImmutableDictionary(x => x.OperatorType, x => x);
         }
 
