@@ -7,11 +7,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TPQPrototype.SearchEngine;
 using TPQPrototype.SearchEngine.Aggregates;
+using TPQPrototype.SearchEngine.Searchers;
 using TPQPrototype.Shared;
 using TPQPrototype.Shared.Enums;
 using TPQPrototype.Shared.Request;
-using TPQPrototype.SolutionEngines;
-using TPQPrototype.SolutionEngines.Solutions;
+using TPQPrototype.SolutionEngine;
+using TPQPrototype.SolutionEngine.Solutions;
 
 namespace TPQPrototype
 {
@@ -23,12 +24,14 @@ namespace TPQPrototype
 
             AddServices<IContentSerializer>(collection);
             AddServices<IFactory>(collection);
-            AddServices<IEngine>(collection);
-            AddServices<ISolution>(collection);
 
-            collection.AddScoped<ISearchEngine, SearchEngine.Engines.SearchEngine>();
+            AddServices<ISearcher>(collection);
+            collection.AddScoped<ISearchEngine, SearchEngine.SearchEngine>();
             collection.Decorate<ISearchEngine, LoyaltyAggregator>();
             collection.Decorate<ISearchEngine, AdminAggregator>();
+
+            AddServices<ISolution>(collection);
+            collection.AddScoped<ISolutionEngine, SolutionEngine.SolutionEngine>();
 
 
             var services = collection.BuildServiceProvider();
@@ -44,15 +47,13 @@ namespace TPQPrototype
             {
                 Networks = new List<long> { 99, 80200 },
                 Operators = new List<OperatorType> { OperatorType.Mastercard, OperatorType.Visa },
-                OperatorSearchParameters = new OperatorSearchParameters()
+
+                ContentTypes = new List<ContentType> { ContentType.Json, ContentType.Xml, ContentType.Batch },
+                SearchParameters = new SearchParameters()
                 {
-                    ContentTypes = new List<ContentType> { ContentType.Json, ContentType.Xml, ContentType.Batch },
-                    ContentSearchParameters = new ContentSearchParameters()
-                    {
-                        SearchText = "",
-                        StartDate = DateTime.Now.AddDays(-5),
-                        EndDate = DateTime.Now
-                    }
+                    SearchText = "",
+                    StartDate = DateTime.Now.AddDays(-5),
+                    EndDate = DateTime.Now
                 }
             };
 
@@ -110,38 +111,6 @@ namespace TPQPrototype
                 collection.AddScoped(service.Interface, service.Implementation);
             }
         }
-
-        //private static void AddSerializers(IServiceCollection services)
-        //{
-        //    //TODO: need to find a way to register dynamically. May be using Scrutor
-
-        //    services.AddScoped<IMastercardXmlContentSerializer, MastercardXmlContentSerializer>();
-        //    services.AddScoped<IMastercardBatchContentSerializer, MastercardBatchContentSerializer>();
-
-        //    services.AddScoped<IVisaJsonContentSerializer, VisaJsonContentSerializer>();
-        //    services.AddScoped<IVisaXmlContentSerializer, VisaXmlContentSerializer>();
-        //}
-        //private static void AddFactories(IServiceCollection services)
-        //{
-        //    //TODO: need to find a way to register dynamically. May be using Scrutor
-
-        //    services.AddScoped<IOperatorSearchEngineFactory, OperatorSearchEngineFactory>();
-        //    services.AddScoped<IMastercardContentSourceSearchEngineFactory, MastercardContentSourceSearchEngineFactory>();
-        //    services.AddScoped<IVisaContentSourceSearchEngineFactory, VisaContentSourceSearchEngineFactory>();
-        //}
-        //private static void AddEngines(IServiceCollection services)
-        //{
-        //    //TODO: need to find a way to register dynamically. May be using Scrutor
-
-        //    services.AddScoped<IOperatorSearchEngine, MastercardSearchEngine>();
-        //    services.AddScoped<IMastercardContentSourceSearchEngine, MastercardXmlSearchEngine>();
-        //    services.AddScoped<IMastercardContentSourceSearchEngine, MastercardBatchSearchEngine>();
-
-
-        //    services.AddScoped<IOperatorSearchEngine, VisaSearchEngine>();
-        //    services.AddScoped<IVisaContentSourceSearchEngine, VisaXmlSearchEngine>();
-        //    services.AddScoped<IVisaContentSourceSearchEngine, VisaJsonSearchEngine>();
-        //}
     }
 
 }

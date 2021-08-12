@@ -5,7 +5,7 @@ using TPQPrototype.Shared.Response;
 
 namespace TPQPrototype.SearchEngine
 {
-    public interface ISearchEngine : IEngine
+    public interface ISearchEngine
     {
         Task<List<SearchResponseModel>> Search(SearchRequestModel request);
     }
