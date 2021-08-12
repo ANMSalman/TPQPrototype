@@ -5,12 +5,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TPQPrototype.Enums;
 using TPQPrototype.SearchEngine;
 using TPQPrototype.SearchEngine.Aggregates;
-using TPQPrototype.SearchEngine.Engines;
 using TPQPrototype.Shared;
+using TPQPrototype.Shared.Enums;
 using TPQPrototype.Shared.Request;
+using TPQPrototype.SolutionEngines;
+using TPQPrototype.SolutionEngines.Solutions;
 
 namespace TPQPrototype
 {
@@ -23,17 +24,23 @@ namespace TPQPrototype
             AddServices<IContentSerializer>(collection);
             AddServices<IFactory>(collection);
             AddServices<IEngine>(collection);
+            AddServices<ISolution>(collection);
 
             collection.AddScoped<ISearchEngine, SearchEngine.Engines.SearchEngine>();
             collection.Decorate<ISearchEngine, LoyaltyAggregator>();
             collection.Decorate<ISearchEngine, AdminAggregator>();
 
-            Console.WriteLine("\nServices Registered");
-
 
             var services = collection.BuildServiceProvider();
 
-            var request = new SearchRequestModel()
+            Console.WriteLine("\nServices Registered");
+
+
+            var watch = new Stopwatch();
+
+            Console.WriteLine("\nSearching...\n");
+
+            var searchRequest = new SearchRequestModel()
             {
                 Networks = new List<long> { 99, 80200 },
                 Operators = new List<OperatorType> { OperatorType.Mastercard, OperatorType.Visa },
@@ -49,21 +56,39 @@ namespace TPQPrototype
                 }
             };
 
-            var engine = services.GetRequiredService<ISearchEngine>();
-
-
-            Console.WriteLine("\nSearching...\n");
-
-            var watch = new Stopwatch();
+            var searchEngine = services.GetRequiredService<ISearchEngine>();
             watch.Start();
 
-            var result = await engine.Search(request);
+            var result = await searchEngine.Search(searchRequest);
 
             watch.Stop();
 
             Console.WriteLine(JsonSerializer.Serialize(result));
             Console.WriteLine();
             Console.WriteLine($"Search Complete. Elapsed Time(milliseconds): {watch.ElapsedMilliseconds}");
+
+
+            Console.WriteLine("\n\nSolving...\n");
+
+            var solutionRequest = new SolutionRequestModel
+            {
+                Ids = new List<Guid>(),
+                Problem = Problem.MIdIssue,
+                Solution = ""
+            };
+
+            watch.Reset();
+
+            var solutionEngine = services.GetRequiredService<ISolutionEngine>();
+
+            watch.Start();
+
+            await solutionEngine.Solve(solutionRequest);
+
+            watch.Stop();
+
+            Console.WriteLine();
+            Console.WriteLine($"Solution Complete. Elapsed Time(milliseconds): {watch.ElapsedMilliseconds}");
 
         }
         private static void AddServices<T>(IServiceCollection collection)

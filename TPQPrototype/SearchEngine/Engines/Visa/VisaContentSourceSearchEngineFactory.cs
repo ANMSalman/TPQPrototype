@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using TPQPrototype.Enums;
 using TPQPrototype.SearchEngine.Engines.Visa.ContentSource;
+using TPQPrototype.Shared.Enums;
 
 namespace TPQPrototype.SearchEngine.Engines.Visa
 {

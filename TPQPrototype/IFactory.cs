@@ -1,4 +1,4 @@
-﻿namespace TPQPrototype.SearchEngine
+﻿namespace TPQPrototype
 {
     public interface IFactory
     {

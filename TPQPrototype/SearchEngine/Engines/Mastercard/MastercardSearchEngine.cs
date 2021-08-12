@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TPQPrototype.Enums;
+using TPQPrototype.Shared.Enums;
 using TPQPrototype.Shared.Request;
 using TPQPrototype.Shared.Response;
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using TPQPrototype.Enums;
 using TPQPrototype.SearchEngine.Engines.Visa.ContentSource;
+using TPQPrototype.Shared.Enums;
 
 namespace TPQPrototype.SearchEngine.Engines.Visa
 {

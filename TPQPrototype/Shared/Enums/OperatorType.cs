@@ -1,4 +1,4 @@
-﻿namespace TPQPrototype.Enums
+﻿namespace TPQPrototype.Shared.Enums
 {
     public enum OperatorType
     {

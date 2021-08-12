@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using TPQPrototype.Enums;
+using TPQPrototype.Shared.Enums;
 
 namespace TPQPrototype.Shared.Request
 {

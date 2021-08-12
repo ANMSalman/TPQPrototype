@@ -1,9 +1,9 @@
 ﻿using System;
 using TPQPrototype.Shared.Enums;
 
-namespace TPQPrototype.Shared.Response
+namespace TPQPrototype.Entities
 {
-    public class SearchResponseModel
+    public class ProcessingQueue
     {
         public Guid Id { get; set; }
         public OperatorType OperatorType { get; set; }
